@@ -49,9 +49,9 @@ class FileDialog(QFileDialog):
         layout = self.layout()
 
         # Add widgets for file searching and manipulation
-        browse_button = QPushButton("Browse")
-        browse_button.clicked.connect(self.browse)
-        layout.addWidget(browse_button)
+        restore_button = QPushButton("Git Restore")
+        restore_button.clicked.connect(self.git_restore)
+        layout.addWidget(restore_button)
 
         open_button = QPushButton("Git Init")
         open_button.clicked.connect(self.init_repository)
@@ -62,7 +62,7 @@ class FileDialog(QFileDialog):
         layout.addWidget(exit_button)
 
         add_button = QPushButton("Git Add")
-        add_button.clicked.connect(self.gitadd)
+        add_button.clicked.connect(self.git_add)
         layout.addWidget(add_button)
 
     def init_repository(self, bare=False):
@@ -74,7 +74,7 @@ class FileDialog(QFileDialog):
         repo = Repo(filelocation)
     def path(self,dir):
         FileDialog.selected_files = dir
-    def gitadd(self, selected_files): # git add누르면
+    def git_add(self, selected_files): # git add누르면
         '''
         pathrepo = self.getExistingDirectory(self, 'search folder to git add', './')
         print("path repo",pathrepo)
@@ -90,17 +90,22 @@ class FileDialog(QFileDialog):
         repo.index.add(filename)
         print(filename,"is on staged")
 
+    def git_restore(self):# restore 기능임
+        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
+        filename = index[-1]  # 파일 이름만 저장
+        index.remove(filename)
+        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation += "/".join(index)
+        repo = Repo(filelocation)
+        repo.git.reset(filename)
+        print(filename, "is on untracked")
 
-    def gitcommit(self):#not implement
+    def git_commit(self):#not implement
         fname = QFileDialog.getOpenFileName(self, 'Open file', './')
         repo = Repo(fname)
         repo.index.commit("commited")
 
-    def browse(self):
-        print("browse call",FileDialog.selected_files)
-        folder_path = QFileDialog.getExistingDirectory()
-        if folder_path:
-            self.searcher = FileSearcher(folder_path)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
