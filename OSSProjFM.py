@@ -44,37 +44,62 @@ class FileDialog(QFileDialog):
         self.setOption(QFileDialog.DontUseNativeDialog, True)
         self.setFileMode(QFileDialog.ExistingFiles)
         self.searcher = FileSearcher("/")  # Create a FileSearcher object with root path '/'
+        self.setup_UI()
 
-        layout = self.layout()
+    def setup_UI(self): # initialize setup UI
+        set_layout = QHBoxLayout() # set of layouts
 
-        # Add widgets for file searching and manipulation
+        group_boxF = QGroupBox("File Browser")
+        main_layout = self.layout()
+        group_boxF.setLayout(main_layout)
+
+        group_boxG = QGroupBox("Git Features")
+
+        button_layout = QVBoxLayout()
+
+        status_label = QLabel("Git Status : ", self)
+
+        button_layout.addWidget(status_label)
+
         restore_button = QPushButton("Git Restore")
         restore_button.clicked.connect(self.git_restore)
-        layout.addWidget(restore_button)
+        button_layout.addWidget(restore_button)
 
         open_button = QPushButton("Git Init")
         open_button.clicked.connect(self.init_repository)
-        layout.addWidget(open_button)
+        button_layout.addWidget(open_button)
 
         exit_button = QPushButton("Exit")
         exit_button.clicked.connect(self.close)
-        layout.addWidget(exit_button)
+        button_layout.addWidget(exit_button)
 
         add_button = QPushButton("Git Add")
         add_button.clicked.connect(self.git_add)
-        layout.addWidget(add_button)
+        button_layout.addWidget(add_button)
 
         rm_button = QPushButton("Git rm")
         rm_button.clicked.connect(self.git_rm)
-        layout.addWidget(rm_button)
+        button_layout.addWidget(rm_button)
 
         rmc_button = QPushButton("Git rm --cached")
         rmc_button.clicked.connect(self.git_rm_cached)
-        layout.addWidget(rmc_button)
+        button_layout.addWidget(rmc_button)
 
         commit_button = QPushButton("Git Commit")
         commit_button.setMenu(self.create_commit_menu())
-        layout.addWidget(commit_button)
+        button_layout.addWidget(commit_button)
+
+        group_boxG.setLayout(button_layout)
+
+        sub1_layout = QHBoxLayout()
+        sub1_layout.addWidget(group_boxF)
+        sub2_layout = QHBoxLayout()
+        sub2_layout.addWidget(group_boxG)
+
+        set_layout.addLayout(sub1_layout)
+        set_layout.addLayout(sub2_layout)
+
+        self.setLayout(set_layout)
 
     def init_repository(self, bare=False):
         #if not FileDialog.selected_files:  # 파일을 선택하지 않았을 때 (빈 폴더일때)
