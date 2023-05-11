@@ -71,7 +71,7 @@ class FileDialog(QFileDialog):
         index.remove(filename)
         filelocation = ""  # 파일 경로 파일이름빼고
         filelocation += "/".join(index)
-        repo = Repo(filelocation)
+        Repo.init(filelocation)  # git init(폴더 내 파일을 선택하였을 때)
     def path(self,dir):
         FileDialog.selected_files = dir
     def git_add(self, selected_files): # git add누르면
