@@ -64,6 +64,14 @@ class FileDialog(QFileDialog):
         add_button.clicked.connect(self.git_add)
         layout.addWidget(add_button)
 
+        rm_button = QPushButton("Git rm")
+        rm_button.clicked.connect(self.git_rm)
+        layout.addWidget(rm_button)
+
+        rmc_button = QPushButton("Git rm --cached")
+        rmc_button.clicked.connect(self.git_rm_cached)
+        layout.addWidget(rmc_button)
+
         commit_button = QPushButton("Git Commit")
         commit_button.setMenu(self.create_commit_menu())
         layout.addWidget(commit_button)
@@ -107,6 +115,26 @@ class FileDialog(QFileDialog):
         repo = Repo(filelocation)
         repo.git.reset(filename)
         print(filename, "is on untracked")
+
+    def git_rm(self):  # git rm (committed -> staged)
+        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
+        filename = index[-1]  # 파일 이름만 저장
+        index.remove(filename)
+        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation += "/".join(index)
+        repo = Repo(filelocation)
+        repo.index.remove(filename, working_tree=True)
+        print(filename, "is deleted")
+
+    def git_rm_cached(self):  # git rm cached
+        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
+        filename = index[-1]  # 파일 이름만 저장
+        index.remove(filename)
+        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation += "/".join(index)
+        repo = Repo(filelocation)
+        repo.index.remove(filename)
+        print(filename, "is untracked (committed -> untracked)")
 
     def create_commit_menu(self):
         menu = QMenu()
