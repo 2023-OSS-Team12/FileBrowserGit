@@ -11,7 +11,6 @@ import pathlib
 
 from git import Repo
 
-
 class FileSearcher:
     def __init__(self, root_path):
         self.root_path = root_path
@@ -26,10 +25,8 @@ class FileSearcher:
     def list_files(self):
         return os.listdir(self.root_path)
 
-
 def move_file(filePath, folder_path):
     shutil.move(filePath, folder_path)
-
 
 def open_file(findPath):
     if platform.system() == 'Darwin':  # macOS
@@ -38,7 +35,6 @@ def open_file(findPath):
         os.startfile(findPath)
     else:  # linux variants
         subprocess.call(('xdg-open', findPath))
-
 
 class FileDialog(QFileDialog):
     selected_files = []
@@ -97,7 +93,12 @@ class FileDialog(QFileDialog):
         rmc_button.clicked.connect(self.git_rm_cached)
         button_layout.addWidget(rmc_button)
 
+        create_file_button = QPushButton("Create File")
+        create_file_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        create_file_button.clicked.connect(self.create_new_file)
+        button_layout.addWidget(create_file_button)
         exit_button = QPushButton("Exit")
+
         exit_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         exit_button.clicked.connect(self.close)
         button_layout.addWidget(exit_button)
@@ -117,7 +118,7 @@ class FileDialog(QFileDialog):
     def path(self, dir):
         FileDialog.selected_files = dir
 
-    def init_repository(self, bare=False):
+    def init_repository(self, bare=False): # git init 기능
         index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
         filename = index[-1]  # 파일 이름만 저장
         index.remove(filename)
@@ -126,25 +127,23 @@ class FileDialog(QFileDialog):
         Repo.init(filelocation)  # 현재 작업 중인 디렉토리를 깃 저장소로 초기화
         print(f"Initialized empty Git repository in {filelocation}")
 
-    def git_add(self, selected_files):  # git add누르면
+    def git_add(self, selected_files):  # git add 기능
         '''
         pathrepo = self.getExistingDirectory(self, 'search folder to git add', './')
         print("path repo",pathrepo)
         repo = git.Repo(pathrepo)
         repo.index.add('new.txt')
         '''
-        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
-        filename = index[-1]  # 파일 이름만 저장
+        index = FileDialog.selected_files[0].split('/')
+        filename = index[-1]
         index.remove(filename)
-        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation = ""
         filelocation += "/".join(index)
         repo = Repo(filelocation)
         repo.index.add(filename)
-        print(filename, "is on staged")
+        print(f"{filename} is on staged")
 
-
-
-    def git_commit(self):
+    def git_commit(self): # git commit 기능
         if not FileDialog.selected_files:
             # [초안]
             # 파일 선택하지 않은 경우(폴더만 선택한 경우), 특정 폴더에서 바로 commit하고 싶은 경우
@@ -180,7 +179,7 @@ class FileDialog(QFileDialog):
         self.show()
         return menu
 
-    def show_staged_changes(self):
+    def show_staged_changes(self): # show staged chages 기능
         if not FileDialog.selected_files:
             # [초안]
             # 파일 선택하지 않은 경우(폴더만 선택한 상태), 특정 폴더의 staged file을 보고 싶은 경우
@@ -211,41 +210,64 @@ class FileDialog(QFileDialog):
         layout.addWidget(list_widget)
         staged_changes_dialog.exec_()
 
-    def git_restore(self):  # restore 기능임
-        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
-        filename = index[-1]  # 파일 이름만 저장
+    def git_restore(self):  # git restore 기능
+        index = FileDialog.selected_files[0].split('/')
+        filename = index[-1]
         index.remove(filename)
-        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation = ""
         filelocation += "/".join(index)
         repo = Repo(filelocation)
         repo.git.reset(filename)
-        print(filename, "is on untracked")
-        
-    def git_rm(self):  # git rm (committed -> staged)
-        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
-        filename = index[-1]  # 파일 이름만 저장
+        print(f"{filename} is on untracked")
+
+    def git_rm(self):  # git rm 기능 (committed -> staged)
+        index = FileDialog.selected_files[0].split('/')
+        filename = index[-1]
         index.remove(filename)
-        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation = ""
         filelocation += "/".join(index)
         repo = Repo(filelocation)
         repo.index.remove(filename, working_tree=True)
-        print(filename, "is deleted")
+        print(f"{filename} is deleted")
 
-    def git_rm_cached(self):  # git rm cached
-        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
-        filename = index[-1]  # 파일 이름만 저장
+    def git_rm_cached(self):  # git rm --cached 기능
+        index = FileDialog.selected_files[0].split('/')
+        filename = index[-1]
         index.remove(filename)
-        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation = ""
         filelocation += "/".join(index)
         repo = Repo(filelocation)
         repo.index.remove(filename)
-        print(filename, "is untracked (committed -> untracked)")
+        print(f"{filename} is untracked (committed -> untracked)")
+
+    def create_new_file(self): # create file 기능
+        # 생성할 파일의 폴더를 지정하기 위해 폴더에 속한 파일을 반드시 선택
+        # (미구현) 최초의 파일 경로 설정이 없으면 에러 - 디렉토리 경로 추출 가능시 구현 가능
+        new_file_name, ok = QInputDialog.getText(self, 'New File', 'Enter name for new file:')  # 사용자에게 입력 받을 대화 상자 생성
+        while ok and not new_file_name.strip():  # 파일 이름이 없는 경우를 처리
+            QMessageBox.warning(self, "Invalid File Name", "File name cannot be empty. Please enter again.")
+            new_file_name, ok = QInputDialog.getText(self, 'New File', 'Enter name for new file:')
+        if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 새 파일 생성
+            file_path = FileDialog.selected_files[0]
+            file_location, file_name = os.path.split(file_path)
+
+            new_file_path = os.path.join(file_location, new_file_name)  # 입력된 파일명으로 새 파일 경로 생성
+
+            uniq = 1
+            while os.path.exists(new_file_path):  # 새 파일에 대한 경로가 이미 존재하는 경우
+                new_file_path = os.path.join(file_location, new_file_name + "(" + str(uniq) + ")")  # 새 파일경로(1)..
+                uniq += 1
+            if uniq > 1:
+                new_file_name += "(%d)" % (uniq - 1)  # 새 파일이름 (1)
+            open(new_file_path, 'w').close() # 파일 생성
+            # 파일이 성공적으로 생성되었음을 알림
+            QMessageBox.information(self, "Create New File", f"New file created: {new_file_name} in {new_file_path}")
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
-    #dialog.exec_()
+    # dialog.exec_()
 
     while (dialog.exec_() == QFileDialog.Accepted):  # exit하기 전까지 무한 반복
         print(dialog.selectedFiles())  # 경로 나오는지 print
