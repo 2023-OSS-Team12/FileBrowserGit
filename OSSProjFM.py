@@ -173,6 +173,7 @@ class FileDialog(QFileDialog):
         commit_staged_changes = QAction("Commit Staged Changes", self)
         commit_staged_changes.triggered.connect(self.gitcommit)
         menu.addAction(commit_staged_changes)
+        self.show()
         return menu
 
     def show_staged_changes(self):
@@ -234,7 +235,7 @@ class FileDialog(QFileDialog):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
-    dialog.exec_()
+    #dialog.exec_()
 
     while (dialog.exec_() == QFileDialog.Accepted):  # exit하기 전까지 무한 반복
         print(dialog.selectedFiles())  # 경로 나오는지 print
