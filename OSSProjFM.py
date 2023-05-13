@@ -4,6 +4,7 @@ import git
 from git import Repo
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import Qt
 import subprocess
 import platform
 import shutil
@@ -47,6 +48,14 @@ class FileDialog(QFileDialog):
         self.setup_UI()
 
     def setup_UI(self):  # initialize setup UI
+        self.setWindowTitle("FileBrowserGit")
+
+        self.resize(700,500)	# setup window center and resizing
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
         set_layout = QHBoxLayout()  # set of layouts
 
         group_boxF = QGroupBox("File Browser")
@@ -57,7 +66,8 @@ class FileDialog(QFileDialog):
         group_boxG.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         button_layout = QVBoxLayout()
 
-        status_label = QLabel("Git Status : ", self)
+        group_boxS = QGroupBox("Git Status")
+        status_layout = QVBoxLayout()
 
         button_layout.addWidget(status_label)
 
@@ -110,10 +120,19 @@ class FileDialog(QFileDialog):
 
         group_boxG.setLayout(button_layout)
 
+        global status_label
+        status_label = QTextBrowser()
+        status_label.setAcceptRichText(True)
+        status_layout.addWidget(status_label)
+
+        group_boxS.setLayout(status_layout)
+
         sub1_layout = QHBoxLayout()
         sub1_layout.addWidget(group_boxF)
         sub2_layout = QHBoxLayout()
         sub2_layout.addWidget(group_boxG)
+        sub3_layout = QHBoxLayout()
+        sub3_layout.addWidget(group_boxS)
 
         set_layout.addLayout(sub1_layout)
         set_layout.addLayout(sub2_layout)
@@ -279,6 +298,15 @@ class FileDialog(QFileDialog):
             # 파일이 성공적으로 생성되었음을 알림
             QMessageBox.information(self, "Create New File", f"New file created: {new_file_name} in {new_file_path}")
 
+    def git_status(self):
+        index = FileDialog.selected_files[0].split('/') 
+        filename = index[-1]
+        index.remove(filename)
+        filelocation = ""
+        filelocation += "/".join(index)
+        stat = git_status.get(filelocation)
+        status_label.setText(stat)
+        
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
