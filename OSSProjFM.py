@@ -9,6 +9,7 @@ import subprocess
 import platform
 import shutil
 import pathlib
+import git_status
 
 from git import Repo
 
@@ -69,6 +70,11 @@ class FileDialog(QFileDialog):
         group_boxS = QGroupBox("Git Status")
         status_layout = QVBoxLayout()
 
+        stat_button = QPushButton("Git status")
+        stat_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        stat_button.clicked.connect(self.git_status)
+        button_layout.addWidget(stat_button)
+        
         open_button = QPushButton("Git Init")
         open_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         open_button.clicked.connect(self.init_repository)
@@ -128,9 +134,9 @@ class FileDialog(QFileDialog):
         sub1_layout = QHBoxLayout()
         sub1_layout.addWidget(group_boxF)
         sub2_layout = QHBoxLayout()
-        sub2_layout.addWidget(group_boxG)
+        sub2_layout.addWidget(group_boxS)
         sub3_layout = QHBoxLayout()
-        sub3_layout.addWidget(group_boxS)
+        sub3_layout.addWidget(group_boxG)
 
         set_layout.addLayout(sub1_layout)
         set_layout.addLayout(sub2_layout)
