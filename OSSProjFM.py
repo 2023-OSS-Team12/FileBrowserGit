@@ -69,8 +69,6 @@ class FileDialog(QFileDialog):
         group_boxS = QGroupBox("Git Status")
         status_layout = QVBoxLayout()
 
-        button_layout.addWidget(status_label)
-
         open_button = QPushButton("Git Init")
         open_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         open_button.clicked.connect(self.init_repository)
@@ -136,6 +134,7 @@ class FileDialog(QFileDialog):
 
         set_layout.addLayout(sub1_layout)
         set_layout.addLayout(sub2_layout)
+        set_layout.addLayout(sub3_layout)
 
         self.setLayout(set_layout)
 
