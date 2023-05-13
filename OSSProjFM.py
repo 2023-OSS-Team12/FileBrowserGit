@@ -93,6 +93,11 @@ class FileDialog(QFileDialog):
         rmc_button.clicked.connect(self.git_rm_cached)
         button_layout.addWidget(rmc_button)
 
+        mv_button = QPushButton("Git mv")
+        mv_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        mv_button.clicked.connect(self.git_mv)
+        button_layout.addWidget(mv_button)
+
         create_file_button = QPushButton("Create File")
         create_file_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         create_file_button.clicked.connect(self.create_new_file)
@@ -239,6 +244,17 @@ class FileDialog(QFileDialog):
         repo = Repo(filelocation)
         repo.index.remove(filename)
         print(f"{filename} is untracked (committed -> untracked)")
+
+    def git_mv(self):  #  git mv
+        index = FileDialog.selected_files[0].split('/')
+        filename = index[-1]
+        index.remove(filename)
+        filelocation = ""
+        filelocation += "/".join(index)
+        repo = Repo(filelocation)
+        rename_text, ok = QInputDialog.getText(self, 'Rename', 'Rename file :')
+        repo.index.move([filelocation + "/" + filename, filelocation + "/" + rename_text])
+        print(f"{filename} is renamed to {rename_text}")
 
     def create_new_file(self): # create file 기능
         # 생성할 파일의 폴더를 지정하기 위해 폴더에 속한 파일을 반드시 선택
