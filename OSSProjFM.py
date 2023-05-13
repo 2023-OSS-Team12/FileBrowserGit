@@ -1,6 +1,8 @@
 import sys
 import os
 import git
+import string
+from subprocess import *
 from git import Repo
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -102,6 +104,11 @@ class FileDialog(QFileDialog):
         exit_button.clicked.connect(self.close)
         button_layout.addWidget(exit_button)
 
+        stat_button = QPushButton("gituntracked")
+        stat_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        stat_button.clicked.connect(self.getUntracked)
+        button_layout.addWidget(stat_button)
+
         group_boxG.setLayout(button_layout)
 
         sub1_layout = QHBoxLayout()
@@ -141,8 +148,6 @@ class FileDialog(QFileDialog):
         repo = Repo(filelocation)
         repo.index.add(filename)
         print(filename, "is on staged")
-
-
 
     def git_commit(self):
         if not FileDialog.selected_files:
@@ -220,7 +225,7 @@ class FileDialog(QFileDialog):
         repo = Repo(filelocation)
         repo.git.reset(filename)
         print(filename, "is on untracked")
-        
+
     def git_rm(self):  # git rm (committed -> staged)
         index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
         filename = index[-1]  # 파일 이름만 저장
@@ -241,16 +246,72 @@ class FileDialog(QFileDialog):
         repo.index.remove(filename)
         print(filename, "is untracked (committed -> untracked)")
 
+    # def git_status(self):
+    #     index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
+    #     filename = index[-1]  # 파일 이름만 저장
+    #     index.remove(filename)
+    #     filelocation = ""  # 파일 경로 파일이름빼고
+    #     filelocation += "/".join(index)
+    #     repo = Repo(filelocation)
+    #     print(repo.index.diff(repo.head.commit))
+    #     print(repo.index.diff(None))
+    #     print(repo.untracked_files)
+
+
+    def command(self,x):
+        return str(Popen(x.split(' '), stdout=PIPE).communicate()[0])
+
+    def rm_empty(self,L):
+        return [l for l in L if (l and l != "")]
+
+    def getUntracked(self):
+        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
+        filename = index[-1]  # 파일 이름만 저장
+        index.remove(filename)
+        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation += "/".join(index)
+        repo = Repo(filelocation)
+        #os.chdir(repo)
+        status = self.command("git status")
+        if "# Untracked files:" in status:
+            untf = status.split("# Untracked files:")[1][1:].split("\n")
+            return self.rm_empty([x[2:] for x in untf if string.strip(x) != "#" and x.startswith("#\t")])
+        else:
+            return []
+
+    def getNew(self):
+        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
+        filename = index[-1]  # 파일 이름만 저장
+        index.remove(filename)
+        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation += "/".join(index)
+        repo = Repo(filelocation)
+        #os.chdir(repo)
+        status = self.command("git status").split("\n")
+        return [x[14:] for x in status if x.startswith("#\tnew file:   ")]
+
+    def getModified(self):
+        index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
+        filename = index[-1]  # 파일 이름만 저장
+        index.remove(filename)
+        filelocation = ""  # 파일 경로 파일이름빼고
+        filelocation += "/".join(index)
+        repo = Repo(filelocation)
+        #os.chdir(repo)
+        status = self.command("git status").split("\n")
+        return [x[14:] for x in status if x.startswith("#\tmodified:   ")]
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
-    #dialog.exec_()
+    # dialog.exec_()
 
     while (dialog.exec_() == QFileDialog.Accepted):  # exit하기 전까지 무한 반복
         print(dialog.selectedFiles())  # 경로 나오는지 print
         # dialog.selectedFiles()
         dialog.selected_files = dialog.selectedFiles()  # 경로 선택해서 저장
         dialog.path(dialog.selectedFiles())
+        dialog.show()
 
     sys.exit(app.exec_())
