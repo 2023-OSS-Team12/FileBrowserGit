@@ -11,9 +11,6 @@ import shutil
 import pathlib
 import git_status
 
-from git import Repo
-
-
 class FileSearcher:
     def __init__(self, root_path):
         self.root_path = root_path
