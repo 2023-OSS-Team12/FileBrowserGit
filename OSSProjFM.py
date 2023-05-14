@@ -256,10 +256,9 @@ class FileDialog(QFileDialog):
             filelocation = ""
             filelocation += "/".join(index)
             repo = Repo(filelocation)
-            repo.index.remove(filename, working_tree=True)
             print(f"{filename} is deleted")
+            repo.index.remove(filename,working_tree= True)
             QMessageBox.information(self, "Git Remove",f"{filename} is deleted" )
-
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_rm_cached(self):  # git rm --cached 기능
@@ -293,27 +292,30 @@ class FileDialog(QFileDialog):
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def create_new_file(self):  # create file 기능
-        # 생성할 파일의 폴더를 지정하기 위해 폴더에 속한 파일을 반드시 선택
-        # (미구현) 최초의 파일 경로 설정이 없으면 에러 - 디렉토리 경로 추출 가능시 구현 가능
-        new_file_name, ok = QInputDialog.getText(self, 'New File', 'Enter name for new file:')  # 사용자에게 입력 받을 대화 상자 생성
-        while ok and not new_file_name.strip():  # 파일 이름이 없는 경우를 처리
-            QMessageBox.warning(self, "Invalid File Name", "File name cannot be empty. Please enter again.")
-            new_file_name, ok = QInputDialog.getText(self, 'New File', 'Enter name for new file:')
-        if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 새 파일 생성
-            file_path = FileDialog.selected_files[0]
-            file_location, file_name = os.path.split(file_path)
+        try:
+            # 생`성할 파일의 폴더를 지정하기 위해 폴더에 속한 파일을 반드시 선택
+            # (미구현) 최초의 파일 경로 설정이 없으면 에러 - 디렉토리 경로 추출 가능시 구현 가능
+            new_file_name, ok = QInputDialog.getText(self, 'New File', 'Enter name for new file:')  # 사용자에게 입력 받을 대화 상자 생성
+            while ok and not new_file_name.strip():  # 파일 이름이 없는 경우를 처리
+                QMessageBox.warning(self, "Invalid File Name", "File name cannot be empty. Please enter again.")
+                new_file_name, ok = QInputDialog.getText(self, 'New File', 'Enter name for new file:')
+            if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 새 파일 생성
+                file_path = FileDialog.selected_files[0]
+                file_location, file_name = os.path.split(file_path)
 
-            new_file_path = os.path.join(file_location, new_file_name)  # 입력된 파일명으로 새 파일 경로 생성
+                new_file_path = os.path.join(file_location, new_file_name)  # 입력된 파일명으로 새 파일 경로 생성
 
-            uniq = 1
-            while os.path.exists(new_file_path):  # 새 파일에 대한 경로가 이미 존재하는 경우
-                new_file_path = os.path.join(file_location, new_file_name + "(" + str(uniq) + ")")  # 새 파일경로(1)..
-                uniq += 1
-            if uniq > 1:
-                new_file_name += "(%d)" % (uniq - 1)  # 새 파일이름 (1)
-            open(new_file_path, 'w').close()  # 파일 생성
-            # 파일이 성공적으로 생성되었음을 알림
-            QMessageBox.information(self, "Create New File", f"New file created: {new_file_name} in {new_file_path}")
+                uniq = 1
+                while os.path.exists(new_file_path):  # 새 파일에 대한 경로가 이미 존재하는 경우
+                    new_file_path = os.path.join(file_location, new_file_name + "(" + str(uniq) + ")")  # 새 파일경로(1)..
+                    uniq += 1
+                if uniq > 1:
+                    new_file_name += "(%d)" % (uniq - 1)  # 새 파일이름 (1)
+                open(new_file_path, 'w').close()  # 파일 생성
+                # 파일이 성공적으로 생성되었음을 알림
+                QMessageBox.information(self, "Create New File", f"New file created: {new_file_name} in {new_file_path}")
+        except:
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
 
     def git_status(self):
         try:
