@@ -9,7 +9,7 @@ The original project is here: [FileManager](https://github.com/Tristan296/FileMa
 
 2. Git Features: This section provides buttons for several Git operations such as:
    - **All files must be selected before use it’s button(Important!)!**
-   - <button name="Git Init"]Git Init</button>: Button for `git init` command. This button initializes a Git repository in the current directory of the selected file.
+   - Git Init: Button for `git init` command. This button initializes a Git repository in the current directory of the selected file.
    - Git Add: Button for `git add` command. This button stages the selected file.
    - Git Commit: Button for `git commit` command and shows staged files. 
       - Show Staged Changes: This button shows the staeged changes(files on staged).
