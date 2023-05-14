@@ -278,8 +278,11 @@ class FileDialog(QFileDialog):
             filelocation += "/".join(index)
             repo = Repo(filelocation)
             rename_text, ok = QInputDialog.getText(self, 'Rename', 'Rename file :')
-            repo.index.move([filelocation + "/" + filename, filelocation + "/" + rename_text])
-            print(f"{filename} is renamed to {rename_text}")
+            if ok:
+                repo.index.move([filelocation + "/" + filename, filelocation + "/" + rename_text])
+                print(f"{filename} is renamed to {rename_text}")
+            else:
+                QMessageBox.warning(self, "Rename", "Rename canceled by user.")
         except:
             print("select file first")
     def create_new_file(self):  # create file 기능
