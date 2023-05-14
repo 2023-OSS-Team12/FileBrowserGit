@@ -159,9 +159,10 @@ class FileDialog(QFileDialog):
             filelocation = ""  # 파일 경로 파일이름빼고
             filelocation += "/".join(index)
             Repo.init(filelocation)  # 현재 작업 중인 디렉토리를 깃 저장소로 초기화
+            QMessageBox.information(self, "Git Init", f"Initialized empty Git repository in {filelocation}")
             print(f"Initialized empty Git repository in {filelocation}")
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_add(self, selected_files):  # git add 기능
         try:
             index = FileDialog.selected_files[0].split('/')
@@ -171,9 +172,10 @@ class FileDialog(QFileDialog):
             filelocation += "/".join(index)
             repo = Repo(filelocation)
             repo.index.add(filename)
+            QMessageBox.information(self, "Git Add", f"{filename} is on staged")
             print(f"{filename} is on staged")
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_commit(self):  # git commit 기능
         try:
             index = FileDialog.selected_files[0].split('/')
@@ -194,7 +196,7 @@ class FileDialog(QFileDialog):
             else:
                 QMessageBox.warning(self, "Git Commit", "Commit canceled by user.")
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def create_commit_menu(self):
         try:
             menu = QMenu()
@@ -207,7 +209,7 @@ class FileDialog(QFileDialog):
             self.show()
             return menu
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def show_staged_changes(self):  # show staged chages 기능
         try:
             index = FileDialog.selected_files[0].split('/')
@@ -232,7 +234,7 @@ class FileDialog(QFileDialog):
             layout.addWidget(list_widget)
             staged_changes_dialog.exec_()
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_restore(self):  # git restore 기능
         try:
             index = FileDialog.selected_files[0].split('/')
@@ -242,9 +244,10 @@ class FileDialog(QFileDialog):
             filelocation += "/".join(index)
             repo = Repo(filelocation)
             repo.git.reset(filename)
+            QMessageBox.information(self, "Git Restore", f"{filename} is on untracked")
             print(f"{filename} is on untracked")
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_rm(self):  # git rm 기능 (committed -> staged)
         try:
             index = FileDialog.selected_files[0].split('/')
@@ -255,8 +258,10 @@ class FileDialog(QFileDialog):
             repo = Repo(filelocation)
             repo.index.remove(filename, working_tree=True)
             print(f"{filename} is deleted")
+            QMessageBox.information(self, "Git Remove",f"{filename} is deleted" )
+
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_rm_cached(self):  # git rm --cached 기능
         try:
             index = FileDialog.selected_files[0].split('/')
@@ -266,9 +271,10 @@ class FileDialog(QFileDialog):
             filelocation += "/".join(index)
             repo = Repo(filelocation)
             repo.index.remove(filename)
+            QMessageBox.information(self, "Git Remove Cached", f"{filename} is untracked (committed -> untracked)")
             print(f"{filename} is untracked (committed -> untracked)")
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_mv(self):  # git mv
         try:
             index = FileDialog.selected_files[0].split('/')
@@ -280,11 +286,12 @@ class FileDialog(QFileDialog):
             rename_text, ok = QInputDialog.getText(self, 'Rename', 'Rename file :')
             if ok:
                 repo.index.move([filelocation + "/" + filename, filelocation + "/" + rename_text])
+                QMessageBox.information(self, "Git Move", f"{filename} is renamed to {rename_text}")
                 print(f"{filename} is renamed to {rename_text}")
             else:
                 QMessageBox.warning(self, "Rename", "Rename canceled by user.")
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def create_new_file(self):  # create file 기능
         # 생성할 파일의 폴더를 지정하기 위해 폴더에 속한 파일을 반드시 선택
         # (미구현) 최초의 파일 경로 설정이 없으면 에러 - 디렉토리 경로 추출 가능시 구현 가능
@@ -318,7 +325,7 @@ class FileDialog(QFileDialog):
             stat = git_status.get(filelocation)
             status_label.setText(stat)
         except:
-            print("select file first")
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
