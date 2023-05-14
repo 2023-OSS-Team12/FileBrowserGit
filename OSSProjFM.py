@@ -173,16 +173,11 @@ class FileDialog(QFileDialog):
         print(f"{filename} is on staged")
 
     def git_commit(self): # git commit 기능
-        if not FileDialog.selected_files:
-            # [초안]
-            # 파일 선택하지 않은 경우(폴더만 선택한 경우), 특정 폴더에서 바로 commit하고 싶은 경우
-            # 대화형 폴더 선택 상자를 생성 -> commit 작업을 수행할 폴더 선택
-            filelocation = QFileDialog.getExistingDirectory(self, "Select Directory")
-        else:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = "/".join(index)
+
+        index = FileDialog.selected_files[0].split('/')
+        filename = index[-1]
+        index.remove(filename)
+        filelocation = "/".join(index)
 
         repo = Repo(filelocation)
         # 사용자에게 커밋 메시지 입력창을 표시
@@ -323,5 +318,6 @@ if __name__ == '__main__':
         # dialog.selectedFiles()
         dialog.selected_files = dialog.selectedFiles()  # 경로 선택해서 저장
         dialog.path(dialog.selectedFiles())
+        dialog.show()
 
     sys.exit(app.exec_())
