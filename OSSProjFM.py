@@ -303,7 +303,7 @@ class FileDialog(QFileDialog):
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
 
-    def make_branch(self):
+    def make_branch(self,branch_name):
         try:
             filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
@@ -317,7 +317,7 @@ class FileDialog(QFileDialog):
     branch_name = 'new-branch'
     create_git_branch(repo_path, branch_name)
     '''
-    def delete_branch(self):
+    def delete_branch(self,branch_name):
         try:
             filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
@@ -330,7 +330,7 @@ class FileDialog(QFileDialog):
         # Usage
         # branch_name = 'branch-to-delete'
         # delete_git_branch(repo_path, branch_name)
-    def rename_branch(self):
+    def rename_branch(self,old_branch_name,new_branch_name):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
@@ -343,7 +343,7 @@ class FileDialog(QFileDialog):
         # old_branch_name = 'old-branch'
         # new_branch_name = 'new-branch'
         # rename_git_branch(repo_path, old_branch_name, new_branch_name)
-    def checkout_branch(self):
+    def checkout_branch(self,branch_name):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
@@ -356,6 +356,80 @@ class FileDialog(QFileDialog):
         # Usage
         # branch_name = 'branch-to-checkout'
         # git_checkout(repo_path, branch_name)
+    def git_merge(self,branch_name):
+        try:
+            filelocation, filename = self.call_file_repo()
+            repo = Repo(filelocation)
+            repo.git.merge(branch_name)
+            print(f"Merged branch '{branch_name}' successfully.")
+        except Exception as e:
+            print(f"An error occurred while merging branch '{branch_name}':")
+            print(e)
+            # Abort the merge in case of a conflict
+            if repo.is_dirty():
+                repo.git.merge('--abort')
+                print("Merge aborted due to conflicts.")
+
+        # branch_name = 'branch-to-merge'
+        # git_merge(repo_path, branch_name)
+
+    def show_git_history(self):
+        try:
+            filelocation, filename = self.call_file_repo()
+            repo = Repo(filelocation)
+            commits = repo.iter_commits()
+
+            for commit in commits:
+                print(f"Commit: {commit.hexsha}")
+                print(f"Author: {commit.author.name} <{commit.author.email}>")
+                print(f"Date: {commit.authored_datetime}")
+                print(f"Message: {commit.message}\n")
+
+        except Exception as e:
+            print(f"An error occurred while retrieving Git history:")
+            print(e)
+
+    def show_git_tree(self,commit_id):
+        try:
+            filelocation, filename = self.call_file_repo()
+            repo = Repo(filelocation)
+            commit = repo.commit(commit_id)
+            tree = commit.tree
+
+            for item in tree.traverse():
+                indent = "    " * item.depth
+                print(f"{indent}{item.path}")
+
+        except Exception as e:
+            print(f"An error occurred while retrieving Git tree:")
+            print(e)
+
+    # Show Git history
+    # show_git_history(repo_path)
+    #
+    # # Show Git tree for a specific commit
+    # commit_id = 'commit-id'
+    # show_git_tree(repo_path, commit_id)
+    def git_clone(self,github_url, username=None, password=None):
+        try:
+            filelocation, filename = self.call_file_repo()
+            repo = Repo.clone_from(github_url, filelocation, username=username, password=password)
+            print(f"Cloned repository from {github_url} successfully.")
+        except Exception as e:
+            print(f"An error occurred while cloning repository from {github_url}:")
+            print(e)
+
+    # Usage
+    #github_url = input("Enter the GitHub repository URL: ")
+
+    if github_url.startswith('https://github.com/'):
+        # Public repository
+        git_clone(repo_path, github_url)
+    else:
+        # Private repository
+        username = input("Enter your GitHub username: ")
+        password = input("Enter your GitHub personal access token: ")
+        git_clone(repo_path, github_url, username=username, password=password)
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
