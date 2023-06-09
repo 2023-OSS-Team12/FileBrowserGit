@@ -347,16 +347,15 @@ class FileDialog(QFileDialog):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
-            repo.git.branch('-m', old_branch_name, new_branch_name)
-            print(f"Renamed branch '{old_branch_name}' to '{new_branch_name}' successfully.")
+            repo.git.checkout(branch_name)
+            print(f"Checked out branch '{branch_name}' successfully.")
         except Exception as e:
-            print(f"An error occurred while renaming branch '{old_branch_name}':")
+            print(f"An error occurred while checking out branch '{branch_name}':")
             print(e)
 
         # Usage
-        # old_branch_name = 'old-branch'
-        # new_branch_name = 'new-branch'
-        # rename_git_branch(repo_path, old_branch_name, new_branch_name)
+        # branch_name = 'branch-to-checkout'
+        # git_checkout(repo_path, branch_name)
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
