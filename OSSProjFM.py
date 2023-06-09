@@ -160,13 +160,17 @@ class FileDialog(QFileDialog):
             print(f"Initialized empty Git repository in {filelocation}")
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
+
+    def call_file_repo(self):
+        index = FileDialog.selected_files[0].split('/')
+        filename = index[-1]
+        index.remove(filename)
+        filelocation = ""
+        filelocation += "/".join(index)
+        return filelocation,filename
     def git_add(self, selected_files):  # git add 기능
         try:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = ""
-            filelocation += "/".join(index)
+            filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
             repo.index.add(filename)
             QMessageBox.information(self, "Git Add", f"{filename} is on staged")
@@ -175,11 +179,7 @@ class FileDialog(QFileDialog):
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_commit(self):  # git commit 기능
         try:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = "/".join(index)
-
+            filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
             # 사용자에게 커밋 메시지 입력창을 표시
             commit_message, ok = QInputDialog.getText(self, 'Commit Message', 'Enter commit message:')
@@ -209,10 +209,7 @@ class FileDialog(QFileDialog):
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def show_staged_changes(self):  # show staged chages 기능
         try:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = "/".join(index)
+            filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
             if repo.head.is_valid():
                 staged_files = [item.a_path for item in repo.index.diff("HEAD")]
@@ -234,11 +231,7 @@ class FileDialog(QFileDialog):
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_restore(self):  # git restore 기능
         try:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = ""
-            filelocation += "/".join(index)
+            filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
             repo.git.reset(filename)
             QMessageBox.information(self, "Git Restore", f"{filename} is on untracked")
@@ -247,11 +240,7 @@ class FileDialog(QFileDialog):
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_rm(self):  # git rm 기능 (committed -> staged)
         try:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = ""
-            filelocation += "/".join(index)
+            filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
             print(f"{filename} is deleted")
             repo.index.remove(filename,working_tree= True)
@@ -260,11 +249,7 @@ class FileDialog(QFileDialog):
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_rm_cached(self):  # git rm --cached 기능
         try:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = ""
-            filelocation += "/".join(index)
+            filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
             repo.index.remove(filename)
             QMessageBox.information(self, "Git Remove Cached", f"{filename} is untracked (committed -> untracked)")
@@ -273,11 +258,7 @@ class FileDialog(QFileDialog):
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
     def git_mv(self):  # git mv
         try:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = ""
-            filelocation += "/".join(index)
+            filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
             rename_text, ok = QInputDialog.getText(self, 'Rename', 'Rename file :')
             if ok:
@@ -316,16 +297,66 @@ class FileDialog(QFileDialog):
 
     def git_status(self):
         try:
-            index = FileDialog.selected_files[0].split('/')
-            filename = index[-1]
-            index.remove(filename)
-            filelocation = ""
-            filelocation += "/".join(index)
+            filelocation,filename = self.call_file_repo()
             stat = git_status.get(filelocation)
             status_label.setText(stat)
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
 
+    def make_branch(self):
+        try:
+            filelocation,filename = self.call_file_repo()
+            repo = Repo(filelocation)
+            new_branch = repo.create_head(branch_name)
+            repo.head.reference = new_branch
+            print(f"Created branch '{branch_name}' successfully.")
+        except Exception as e:
+            print(f"An error occurred while creating branch '{branch_name}':")
+            print(e)
+    '''
+    branch_name = 'new-branch'
+    create_git_branch(repo_path, branch_name)
+    '''
+    def delete_branch(self):
+        try:
+            filelocation,filename = self.call_file_repo()
+            repo = Repo(filelocation)
+            repo.git.branch('-D', branch_name)
+            print(f"Deleted branch '{branch_name}' successfully.")
+        except Exception as e:
+            print(f"An error occurred while deleting branch '{branch_name}':")
+            print(e)
+
+        # Usage
+        # branch_name = 'branch-to-delete'
+        # delete_git_branch(repo_path, branch_name)
+    def rename_branch(self):
+        try:
+            filelocation, filename = self.call_file_repo()
+            repo = Repo(filelocation)
+            repo.git.branch('-m', old_branch_name, new_branch_name)
+            print(f"Renamed branch '{old_branch_name}' to '{new_branch_name}' successfully.")
+        except Exception as e:
+            print(f"An error occurred while renaming branch '{old_branch_name}':")
+            print(e)
+        # Usage
+        # old_branch_name = 'old-branch'
+        # new_branch_name = 'new-branch'
+        # rename_git_branch(repo_path, old_branch_name, new_branch_name)
+    def checkout_branch(self):
+        try:
+            filelocation, filename = self.call_file_repo()
+            repo = Repo(filelocation)
+            repo.git.branch('-m', old_branch_name, new_branch_name)
+            print(f"Renamed branch '{old_branch_name}' to '{new_branch_name}' successfully.")
+        except Exception as e:
+            print(f"An error occurred while renaming branch '{old_branch_name}':")
+            print(e)
+
+        # Usage
+        # old_branch_name = 'old-branch'
+        # new_branch_name = 'new-branch'
+        # rename_git_branch(repo_path, old_branch_name, new_branch_name)
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
