@@ -38,7 +38,6 @@ def open_file(findPath):
     else:  # linux variants
         subprocess.call(('xdg-open', findPath))
 
-
 class FileDialog(QFileDialog):
     selected_files = []
 
@@ -339,7 +338,30 @@ class FileDialog(QFileDialog):
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
 
     def get_branch_name(self):
-        branch_name = input('input branch name')
+        try:
+            branch_name, ok = QInputDialog.getText(self, 'Branch input', 'Enter name for Branch:')  # 사용자에게 입력 받을 대화 상자 생성
+            while ok and not branch_name.strip():  # 파일 이름이 없는 경우를 처리
+                QMessageBox.warning(self, "Invalid Branch Name", "Branch name cannot be empty. Please enter again.")
+                branch_name, ok = QInputDialog.getText(self, 'Branch Name', 'Enter name for Branch:')
+            if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 새 파일 생성
+                QMessageBox.information(self, "", f"New branch created: {branch_name}")
+                return branch_name
+        except:
+            QMessageBox.warning(self, "Error", "Error.\n")
+
+    def get_id(self):
+        try:
+            branch_name, ok = QInputDialog.getText(self, 'Branch input',
+                                                   'Enter name for Branch:')  # 사용자에게 입력 받을 대화 상자 생성
+            while ok and not branch_name.strip():  # 파일 이름이 없는 경우를 처리
+                QMessageBox.warning(self, "Invalid Branch Name", "Branch name cannot be empty. Please enter again.")
+                branch_name, ok = QInputDialog.getText(self, 'Branch Name', 'Enter name for Branch:')
+            if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 새 파일 생성
+                QMessageBox.information(self, "", f"New branch created: {branch_name}")
+                return branch_name
+        except:
+            QMessageBox.warning(self, "Error", "Error.\n")
+    #branch_name = input('input branch name')
         return branch_name
     def make_branch(self):
         try:
@@ -417,18 +439,19 @@ class FileDialog(QFileDialog):
             repo = Repo(filelocation)
             commits = repo.iter_commits()
             for commit in commits:
-                print(f"Commit: {commit.hexsha}")
-                print(f"Author: {commit.author.name} <{commit.author.email}>")
-                print(f"Date: {commit.authored_datetime}")
+                print(f"Commit: {commit.hexsha}",end = ' ')
+                print(f"Author: {commit.author.name} <{commit.author.email}>",end = ' ')
+                print(f"Date: {commit.authored_datetime}",end = ' ')
                 print(f"Message: {commit.message}\n")
-            self.show_git_tree()
+
+            self.show_git_tree(self.get_id(),filelocation)
         except Exception as e:
             print(f"An error occurred while retrieving Git history:")
             print(e)
 
-    def show_git_tree(self,commit_id):
+    def show_git_tree(self,commit_id,filelocation):
         try:
-            filelocation, filename = self.call_file_repo()
+            #filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
             commit = repo.commit(commit_id)
             tree = commit.tree
@@ -478,3 +501,7 @@ if __name__ == '__main__':
         dialog.show()
 
     sys.exit(app.exec_())
+
+
+
+
