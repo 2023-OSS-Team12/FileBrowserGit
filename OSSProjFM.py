@@ -188,7 +188,7 @@ class FileDialog(QFileDialog):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
-            Repo.init(filelocation)  # 현재 작업 중인 디렉토리를 깃 저장소로 초기화
+            repo.init(filelocation)  # 현재 작업 중인 디렉토리를 깃 저장소로 초기화
             QMessageBox.information(self, "Git Init", f"Initialized empty Git repository in {filelocation}")
             print(f"Initialized empty Git repository in {filelocation}")
         except:
