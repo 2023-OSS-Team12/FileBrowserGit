@@ -184,15 +184,6 @@ class FileDialog(QFileDialog):
     def path(self, dir):
         FileDialog.selected_files = dir
 
-    def init_repository(self, bare=False):  # git init 기능
-        try:
-            filelocation, filename = self.call_file_repo()
-            repo = Repo(filelocation)
-            repo.init(filelocation)  # 현재 작업 중인 디렉토리를 깃 저장소로 초기화
-            QMessageBox.information(self, "Git Init", f"Initialized empty Git repository in {filelocation}")
-            print(f"Initialized empty Git repository in {filelocation}")
-        except:
-            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
 
     def call_file_repo(self):
         index = FileDialog.selected_files[0].split('/')
@@ -200,7 +191,21 @@ class FileDialog(QFileDialog):
         index.remove(filename)
         filelocation = ""
         filelocation += "/".join(index)
+        print(filelocation,'and',filename)
         return filelocation,filename
+
+    def init_repository(self, bare=False):  # git init 기능
+        try:
+            filelocation, filename = self.call_file_repo()
+            print("filelocation is ",filelocation)
+            repo = Repo.init(filelocation)
+            #Repo.init(filelocation)  # 현재 작업 중인 디렉토리를 깃 저장소로 초기화
+            QMessageBox.information(self, "Git Init", f"Initialized empty Git repository in {filelocation}")
+            print(f"Initialized empty Git repository in {filelocation}")
+        except:
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
+
+
     def git_add(self, selected_files):  # git add 기능
         try:
             filelocation,filename = self.call_file_repo()
@@ -502,6 +507,5 @@ if __name__ == '__main__':
 
     sys.exit(app.exec_())
 #tomerge
-
 
 
