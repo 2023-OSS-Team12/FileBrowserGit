@@ -228,6 +228,7 @@ class FileDialog(QFileDialog):
                 QMessageBox.warning(self, "Git Commit", "Commit canceled by user.")
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
+
     def create_commit_menu(self):
         try:
             menu = QMenu()
@@ -347,10 +348,9 @@ class FileDialog(QFileDialog):
             branch_name = self.get_branch_name()
             new_branch = repo.create_head(branch_name)
             repo.head.reference = new_branch
-            print(f"Created branch '{branch_name}' successfully.")
-        except Exception as e:
-            print(f"An error occurred while creating branch '{branch_name}':")
-            print(e)
+            QMessageBox.information(self,"Make branch",f"Created branch '{branch_name}' successfully.")
+        except:
+            QMessageBox.warning(self,"Error",f"An error occurred while creating branch '{branch_name}':")
     '''
     branch_name = 'new-branch'
     create_git_branch(repo_path, branch_name)
@@ -361,11 +361,9 @@ class FileDialog(QFileDialog):
             repo = Repo(filelocation)
             branch_name = self.get_branch_name()
             repo.git.branch('-D', branch_name)
-            print(f"Deleted branch '{branch_name}' successfully.")
-        except Exception as e:
-            print(f"An error occurred while deleting branch '{branch_name}':")
-            print(e)
-
+            QMessageBox.information(self,"Delete branch",f"Deleted branch '{branch_name}' successfully.")
+        except:
+            QMessageBox.warning(self,"Error",f"An error occurred while deleting branch '{branch_name}':")
         # Usage
         # branch_name = 'branch-to-delete'
         # delete_git_branch(repo_path, branch_name)
@@ -376,10 +374,9 @@ class FileDialog(QFileDialog):
             old_branch_name = self.get_branch_name()
             new_branch_name = self.get_branch_name()
             repo.git.branch('-m', old_branch_name, new_branch_name)
-            print(f"Renamed branch '{old_branch_name}' to '{new_branch_name}' successfully.")
-        except Exception as e:
-            print(f"An error occurred while renaming branch '{old_branch_name}':")
-            print(e)
+            QMessageBox.information(self,"Rename branch",f"Renamed branch '{old_branch_name}' to '{new_branch_name}' successfully.")
+        except:
+            QMessageBox.warning(self,"Error",f"An error occurred while renaming branch '{old_branch_name}':")
         # Usage
         # old_branch_name = 'old-branch'
         # new_branch_name = 'new-branch'
@@ -391,10 +388,9 @@ class FileDialog(QFileDialog):
             branch_name = self.get_branch_name()
             repo.git.checkout(branch_name)
             print(f"Checked out branch '{branch_name}' successfully.")
-        except Exception as e:
-            print(f"An error occurred while checking out branch '{branch_name}':")
-            print(e)
-
+            QMessageBox.information(self,"Checkout branch",f"Checked out branch '{branch_name}' successfully.")
+        except:
+            QMessageBox.warning(self,"Error",f"An error occurred while checking out branch '{branch_name}':")
         # Usage
         # branch_name = 'branch-to-checkout'
         # git_checkout(repo_path, branch_name)
@@ -404,18 +400,17 @@ class FileDialog(QFileDialog):
             repo = Repo(filelocation)
             branch_name = self.get_branch_name()
             repo.git.merge(branch_name)
-            print(f"Merged branch '{branch_name}' successfully.")
-        except Exception as e:
-            print(f"An error occurred while merging branch '{branch_name}':")
-            print(e)
-            # Abort the merge in case of a conflict
+            QMessageBox.information(self,"Merge branch",f"Merged branch '{branch_name}' successfully.")
+        except:
+            QMessageBox.warning(self,"Error",f"An error occurred while merging branch '{branch_name}':")
             if repo.is_dirty():
                 repo.git.merge('--abort')
-                print("Merge aborted due to conflicts.")
+                QMessageBox.warning(self, "Error", "Merge aborted due to conflicts.")
+                #print("Merge aborted due to conflicts.")
 
         # branch_name = 'branch-to-merge'
         # git_merge(repo_path, branch_name)
-
+#히스토리랑 트리출력 메시지박스 해야됨
     def show_git_history(self):
         try:
             filelocation, filename = self.call_file_repo()
@@ -457,9 +452,9 @@ class FileDialog(QFileDialog):
             filelocation, filename = self.call_file_repo()
             repo = Repo.clone_from(github_url, filelocation, username=username, password=password)
             print(f"Cloned repository from {github_url} successfully.")
-        except Exception as e:
-            print(f"An error occurred while cloning repository from {github_url}:")
-            print(e)
+            QMessageBox.information(self,"Git clone branch",f"Cloned repository from {github_url} successfully.")
+        except:
+            QMessageBox.warning(self,"Error",f"An error occurred while cloning repository from {github_url}:")
 
     # Usage
     #github_url = input("Enter the GitHub repository URL: ")
