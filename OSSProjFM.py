@@ -122,6 +122,43 @@ class FileDialog(QFileDialog):
         exit_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         exit_button.clicked.connect(self.close)
         button_layout.addWidget(exit_button)
+#branch button
+        make_branch_button = QPushButton("Make branch")
+        make_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        make_branch_button.clicked.connect(self.make_branch)
+        button_layout.addWidget(make_branch_button)
+
+        delete_branch_button = QPushButton("Delete branch")
+        delete_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        delete_branch_button.clicked.connect(self.delete_branch)
+        button_layout.addWidget(delete_branch_button)
+
+        rename_branch_button = QPushButton("Rename branch")
+        rename_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        rename_branch_button.clicked.connect(self.rename_branch)
+        button_layout.addWidget(rename_branch_button)
+
+        checkout_branch_button = QPushButton("Checkout branch")
+        checkout_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        checkout_branch_button.clicked.connect(self.checkout_branch)
+        button_layout.addWidget(checkout_branch_button)
+
+        merge_branch_button = QPushButton("Merge branch")
+        merge_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        merge_branch_button.clicked.connect(self.git_merge)
+        button_layout.addWidget(merge_branch_button)
+
+        show_history_button = QPushButton("Show history")
+        show_history_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        show_history_button.clicked.connect(self.show_git_history)
+        button_layout.addWidget(show_history_button)
+
+        git_clone_button = QPushButton("Git clone")
+        git_clone_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        git_clone_button.clicked.connect(self.git_clone)
+        button_layout.addWidget(git_clone_button)
+
+
 
         group_boxG.setLayout(button_layout)
 
@@ -150,11 +187,8 @@ class FileDialog(QFileDialog):
 
     def init_repository(self, bare=False):  # git init 기능
         try:
-            index = FileDialog.selected_files[0].split('/')  # 파일 위치를 불러옴, /로 나눔
-            filename = index[-1]  # 파일 이름만 저장
-            index.remove(filename)
-            filelocation = ""  # 파일 경로 파일이름빼고
-            filelocation += "/".join(index)
+            filelocation, filename = self.call_file_repo()
+            repo = Repo(filelocation)
             Repo.init(filelocation)  # 현재 작업 중인 디렉토리를 깃 저장소로 초기화
             QMessageBox.information(self, "Git Init", f"Initialized empty Git repository in {filelocation}")
             print(f"Initialized empty Git repository in {filelocation}")
@@ -303,10 +337,14 @@ class FileDialog(QFileDialog):
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
 
-    def make_branch(self,branch_name):
+    def get_branch_name(self):
+        branch_name = input('input branch name')
+        return branch_name
+    def make_branch(self):
         try:
             filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
+            branch_name = self.get_branch_name()
             new_branch = repo.create_head(branch_name)
             repo.head.reference = new_branch
             print(f"Created branch '{branch_name}' successfully.")
@@ -317,10 +355,11 @@ class FileDialog(QFileDialog):
     branch_name = 'new-branch'
     create_git_branch(repo_path, branch_name)
     '''
-    def delete_branch(self,branch_name):
+    def delete_branch(self):
         try:
             filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
+            branch_name = self.get_branch_name()
             repo.git.branch('-D', branch_name)
             print(f"Deleted branch '{branch_name}' successfully.")
         except Exception as e:
@@ -330,10 +369,12 @@ class FileDialog(QFileDialog):
         # Usage
         # branch_name = 'branch-to-delete'
         # delete_git_branch(repo_path, branch_name)
-    def rename_branch(self,old_branch_name,new_branch_name):
+    def rename_branch(self):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
+            old_branch_name = self.get_branch_name()
+            new_branch_name = self.get_branch_name()
             repo.git.branch('-m', old_branch_name, new_branch_name)
             print(f"Renamed branch '{old_branch_name}' to '{new_branch_name}' successfully.")
         except Exception as e:
@@ -343,10 +384,11 @@ class FileDialog(QFileDialog):
         # old_branch_name = 'old-branch'
         # new_branch_name = 'new-branch'
         # rename_git_branch(repo_path, old_branch_name, new_branch_name)
-    def checkout_branch(self,branch_name):
+    def checkout_branch(self):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
+            branch_name = self.get_branch_name()
             repo.git.checkout(branch_name)
             print(f"Checked out branch '{branch_name}' successfully.")
         except Exception as e:
@@ -356,10 +398,11 @@ class FileDialog(QFileDialog):
         # Usage
         # branch_name = 'branch-to-checkout'
         # git_checkout(repo_path, branch_name)
-    def git_merge(self,branch_name):
+    def git_merge(self):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
+            branch_name = self.get_branch_name()
             repo.git.merge(branch_name)
             print(f"Merged branch '{branch_name}' successfully.")
         except Exception as e:
@@ -378,13 +421,12 @@ class FileDialog(QFileDialog):
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
             commits = repo.iter_commits()
-
             for commit in commits:
                 print(f"Commit: {commit.hexsha}")
                 print(f"Author: {commit.author.name} <{commit.author.email}>")
                 print(f"Date: {commit.authored_datetime}")
                 print(f"Message: {commit.message}\n")
-
+            self.show_git_tree()
         except Exception as e:
             print(f"An error occurred while retrieving Git history:")
             print(e)
@@ -422,14 +464,14 @@ class FileDialog(QFileDialog):
     # Usage
     #github_url = input("Enter the GitHub repository URL: ")
 
-    if github_url.startswith('https://github.com/'):
-        # Public repository
-        git_clone(repo_path, github_url)
-    else:
-        # Private repository
-        username = input("Enter your GitHub username: ")
-        password = input("Enter your GitHub personal access token: ")
-        git_clone(repo_path, github_url, username=username, password=password)
+    # if github_url.startswith('https://github.com/'):
+    #     # Public repository
+    #     git_clone(repo_path, github_url)
+    # else:
+    #     # Private repository
+    #     username = input("Enter your GitHub username: ")
+    #     password = input("Enter your GitHub personal access token: ")
+    #     git_clone(repo_path, github_url, username=username, password=password)
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
