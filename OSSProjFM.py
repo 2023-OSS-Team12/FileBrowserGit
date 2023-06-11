@@ -407,7 +407,6 @@ class FileDialog(QFileDialog):
             branch_name = self.get_branch_name()
             if branch_name is not None:
                 new_branch = repo.create_head(branch_name)
-                repo.head.reference = new_branch
                 QMessageBox.information(self,"Make branch",f"Created branch '{branch_name}' successfully.")
                 self.current_branches(repo, self.list_widget) # update QListWidget
         except:
