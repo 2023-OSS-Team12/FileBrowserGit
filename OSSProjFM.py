@@ -327,10 +327,10 @@ class FileDialog(QFileDialog):
         bDialog.setWindowTitle("Branch Features")
         layout = QHBoxLayout(bDialog)
 
-        list_widget = QListWidget()
-        self.current_branches(repo,list_widget)
+        self.list_widget = QListWidget()
+        self.current_branches(repo,self.list_widget)
 
-        layout.addWidget(list_widget)
+        layout.addWidget(self.list_widget)
         button_layout = QVBoxLayout()
 
         # branch button
@@ -410,6 +410,7 @@ class FileDialog(QFileDialog):
                 new_branch = repo.create_head(branch_name)
                 repo.head.reference = new_branch
                 QMessageBox.information(self,"Make branch",f"Created branch '{branch_name}' successfully.")
+                self.current_branches(repo, self.list_widget) # update QListWidget
         except:
             QMessageBox.warning(self,"Error",f"An error occurred while creating branch '{branch_name}':")
     def delete_branch(self):
@@ -419,6 +420,7 @@ class FileDialog(QFileDialog):
             branch_name = self.get_branch_name()
             repo.git.branch('-D', branch_name)
             QMessageBox.information(self,"Delete branch",f"Deleted branch '{branch_name}' successfully.")
+            self.current_branches(repo, self.list_widget)  # update QListWidget
         except:
             QMessageBox.warning(self,"Error",f"An error occurred while deleting branch '{branch_name}':")
     def rename_branch(self):
@@ -429,6 +431,7 @@ class FileDialog(QFileDialog):
             new_branch_name = self.get_branch_name()
             repo.git.branch('-m', old_branch_name, new_branch_name)
             QMessageBox.information(self,"Rename branch",f"Renamed branch '{old_branch_name}' to '{new_branch_name}' successfully.")
+            self.current_branches(repo, self.list_widget)  # update QListWidget
         except:
             QMessageBox.warning(self,"Error",f"An error occurred while renaming branch '{old_branch_name}':")
     def checkout_branch(self):
@@ -449,6 +452,7 @@ class FileDialog(QFileDialog):
             branch_name = self.get_branch_name()
             repo.git.merge(branch_name)
             QMessageBox.information(self,"Merge branch",f"Merged branch '{branch_name}' successfully.")
+            self.current_branches(repo, self.list_widget)  # update QListWidget
         except:
             QMessageBox.warning(self,"Error",f"An error occurred while merging branch '{branch_name}':")
             if repo.is_dirty():
@@ -539,4 +543,6 @@ if __name__ == '__main__':
 
     sys.exit(app.exec_())
 #tomerge
+
+
 
