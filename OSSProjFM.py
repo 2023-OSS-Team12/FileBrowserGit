@@ -349,18 +349,27 @@ class FileDialog(QFileDialog):
             QMessageBox.warning(self, "Error", "Error.\n")
     def get_id(self):
         try:
-            branch_name, ok = QInputDialog.getText(self, 'Branch input',
-                                                   'Enter name for Branch:')  # 사용자에게 입력 받을 대화 상자 생성
-            while ok and not branch_name.strip():  # 파일 이름이 없는 경우를 처리
-                QMessageBox.warning(self, "Invalid Branch Name", "Branch name cannot be empty. Please enter again.")
-                branch_name, ok = QInputDialog.getText(self, 'Branch Name', 'Enter name for Branch:')
+            ID, ok = QInputDialog.getText(self, 'ID input',
+                                                   'Enter ID:')  # 사용자에게 입력 받을 대화 상자 생성
+            while ok and not ID.strip():  # 파일 이름이 없는 경우를 처리
+                QMessageBox.warning(self, "Invalid ID Name", "ID cannot be empty. Please enter again.")
+                ID, ok = QInputDialog.getText(self, 'ID', 'Enter ID:')
             if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 새 파일 생성
-                QMessageBox.information(self, "", f"New branch created: {branch_name}")
-                return branch_name
+                QMessageBox.information(self, "", f"Access: {ID}")
+                return ID
         except:
             QMessageBox.warning(self, "Error", "Error.\n")
     #branch_name = input('input branch name')
-        return branch_name
+        return ID
+    def show_branch(self):
+        filelocation, filename = self.call_file_repo()
+        repo = Repo(filelocation)
+        branches = repo.branches
+        for branch in branches:
+            self.lbox_item = self.qtwid.QListWidget(self)
+            self.lb_item = self.qtwid.QLabel("[선택 항목]", self)
+            self.btn_remove = self.qtwid.QPushButton("삭제", self)
+            print(branch.name)
     def make_branch(self):
         try:
             filelocation,filename = self.call_file_repo()
@@ -454,6 +463,55 @@ class FileDialog(QFileDialog):
     # commit_id = 'commit-id'
     # show_git_tree(repo_path, commit_id)
     def git_clone(self,github_url, username=None, password=None):
+        # Create the application
+        app = QApplication([])
+
+        # Check if the repository is public or private
+        repository_visibility, ok = self.QFileDialog.getItem(
+            None,
+            "Repository Visibility",
+            "Is the GitHub repository public or private?",
+            ["public", "private"]
+        )
+
+        if ok:
+            if repository_visibility == "public":
+                # Prompt for the public repository URL
+                repository_url, _ = QFileDialog.getOpenFileName(
+                    None,
+                    "Public Repository",
+                    "Select the GitHub repository URL"
+                )
+                git.Repo.clone_from(repository_url, './')
+
+            elif repository_visibility == "private":
+                # Prompt for the private repository URL, ID, and access token
+                repository_url, _ = QFileDialog.getOpenFileName(
+                    None,
+                    "Private Repository",
+                    "Select the GitHub repository URL"
+                )
+                github_id, ok = QFileDialog.getText(
+                    None,
+                    "GitHub Credentials",
+                    "Enter your GitHub username or organization name:"
+                )
+                if ok:
+                    github_token, ok = QFileDialog.getText(
+                        None,
+                        "GitHub Credentials",
+                        "Enter your GitHub access token:"
+                    )
+                    if ok:
+                        # Set the GitHub credentials for cloning the private repository
+                        git.config.Git().set_credentials(github_id, github_token)
+                        git.Repo.clone_from(repository_url, './')
+
+            else:
+                QMessageBox.warning(None, "Invalid Input", "Invalid repository visibility.")
+
+
+'''
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo.clone_from(github_url, filelocation, username=username, password=password)
@@ -473,6 +531,7 @@ class FileDialog(QFileDialog):
     #     username = input("Enter your GitHub username: ")
     #     password = input("Enter your GitHub personal access token: ")
     #     git_clone(repo_path, github_url, username=username, password=password)
+'''
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
