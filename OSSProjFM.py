@@ -10,6 +10,7 @@ import platform
 import shutil
 import pathlib
 import git_status
+#test
 class FileSearcher:
     def __init__(self, root_path):
         self.root_path = root_path
@@ -115,48 +116,21 @@ class FileDialog(QFileDialog):
         create_file_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         create_file_button.clicked.connect(self.create_new_file)
         button_layout.addWidget(create_file_button)
-        exit_button = QPushButton("Exit")
 
+        BF_button = QPushButton("Branch Feature")
+        BF_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        BF_button.clicked.connect(self.branch_open)
+        button_layout.addWidget(BF_button)
+
+        exit_button = QPushButton("Exit")
         exit_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         exit_button.clicked.connect(self.close)
         button_layout.addWidget(exit_button)
-#branch button
-        make_branch_button = QPushButton("Make branch")
-        make_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        make_branch_button.clicked.connect(self.make_branch)
-        button_layout.addWidget(make_branch_button)
-
-        delete_branch_button = QPushButton("Delete branch")
-        delete_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        delete_branch_button.clicked.connect(self.delete_branch)
-        button_layout.addWidget(delete_branch_button)
-
-        rename_branch_button = QPushButton("Rename branch")
-        rename_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        rename_branch_button.clicked.connect(self.rename_branch)
-        button_layout.addWidget(rename_branch_button)
-
-        checkout_branch_button = QPushButton("Checkout branch")
-        checkout_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        checkout_branch_button.clicked.connect(self.checkout_branch)
-        button_layout.addWidget(checkout_branch_button)
-
-        merge_branch_button = QPushButton("Merge branch")
-        merge_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        merge_branch_button.clicked.connect(self.git_merge)
-        button_layout.addWidget(merge_branch_button)
-
-        show_history_button = QPushButton("Show history")
-        show_history_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        show_history_button.clicked.connect(self.show_git_history)
-        button_layout.addWidget(show_history_button)
 
         git_clone_button = QPushButton("Git clone")
         git_clone_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         git_clone_button.clicked.connect(self.git_clone)
         button_layout.addWidget(git_clone_button)
-
-
 
         group_boxG.setLayout(button_layout)
 
@@ -203,6 +177,8 @@ class FileDialog(QFileDialog):
             print(f"Initialized empty Git repository in {filelocation}")
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
+
+
     def git_add(self, selected_files):  # git add 기능
         try:
             filelocation,filename = self.call_file_repo()
@@ -229,6 +205,7 @@ class FileDialog(QFileDialog):
                 QMessageBox.warning(self, "Git Commit", "Commit canceled by user.")
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
+
     def create_commit_menu(self):
         try:
             menu = QMenu()
@@ -329,6 +306,7 @@ class FileDialog(QFileDialog):
                 QMessageBox.information(self, "Create New File", f"New file created: {new_file_name} in {new_file_path}")
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
+
     def git_status(self):
         try:
             filelocation,filename = self.call_file_repo()
@@ -337,17 +315,79 @@ class FileDialog(QFileDialog):
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
 
-    # branch_name = input('input branch name')
+    def branch_open(self):
+        try:
+            filelocation,filename = self.call_file_repo()
+            repo = Repo(filelocation)
+        except:
+            QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
+            return
+
+        bDialog = QDialog(self)
+        bDialog.setWindowTitle("Branch Features")
+        layout = QHBoxLayout(bDialog)
+
+        list_widget = QListWidget()
+        self.current_branches(repo,list_widget)
+
+        layout.addWidget(list_widget)
+        button_layout = QVBoxLayout()
+
+        # branch button
+        make_branch_button = QPushButton("Make branch")
+        make_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        make_branch_button.clicked.connect(self.make_branch)
+        button_layout.addWidget(make_branch_button)
+
+        delete_branch_button = QPushButton("Delete branch")
+        delete_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        delete_branch_button.clicked.connect(self.delete_branch)
+        button_layout.addWidget(delete_branch_button)
+
+        rename_branch_button = QPushButton("Rename branch")
+        rename_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        rename_branch_button.clicked.connect(self.rename_branch)
+        button_layout.addWidget(rename_branch_button)
+
+        checkout_branch_button = QPushButton("Checkout branch")
+        checkout_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        checkout_branch_button.clicked.connect(self.checkout_branch)
+        button_layout.addWidget(checkout_branch_button)
+
+        merge_branch_button = QPushButton("Merge branch")
+        merge_branch_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        merge_branch_button.clicked.connect(self.git_merge)
+        button_layout.addWidget(merge_branch_button)
+
+        show_history_button = QPushButton("Show history")
+        show_history_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        show_history_button.clicked.connect(self.show_git_history)
+        button_layout.addWidget(show_history_button)
+        layout.addLayout(button_layout)
+
+        bDialog.exec_()
+
+    def current_branches(self, repo, listwidget):
+        res = []
+        branches = repo.branches
+        for b in branches:
+            res.append(b.name)
+        listwidget.clear()
+        listwidget.addItems(res)
+
+
+
     def get_branch_name(self):
         try:
             branch_name, ok = QInputDialog.getText(self, 'Branch input', 'Enter name for Branch:')
-            while ok and not branch_name.strip():  # 브랜치 입력이 없는 경우를 처리
+            while ok and not branch_name.strip():  # 브랜치 이름 입력이 없는 경우를 처리
                 QMessageBox.warning(self, "Invalid Branch Name", "Branch name cannot be empty. Please enter again.")
                 branch_name, ok = QInputDialog.getText(self, 'Branch Name', 'Enter name for Branch:')
             if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 브랜치 이름 반환
                 return branch_name
         except:
             QMessageBox.warning(self, "Error", "Error.\n")
+
     def get_id(self):
         try:
             ID, ok = QInputDialog.getText(self, 'ID input', 'Enter ID:')
@@ -360,15 +400,7 @@ class FileDialog(QFileDialog):
         except:
             QMessageBox.warning(self, "Error", "Error.\n")
         return ID
-    def show_branch(self):
-        filelocation, filename = self.call_file_repo()
-        repo = Repo(filelocation)
-        branches = repo.branches
-        for branch in branches:
-            self.lbox_item = self.qtwid.QListWidget(self)
-            self.lb_item = self.qtwid.QLabel("[선택 항목]", self)
-            self.btn_remove = self.qtwid.QPushButton("삭제", self)
-            print(branch.name)
+
     def make_branch(self):
         try:
             filelocation,filename = self.call_file_repo()
@@ -384,9 +416,6 @@ class FileDialog(QFileDialog):
         try:
             filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
-            branches = repo.branches
-            for branch in branches:
-                print(branch.name)
             branch_name = self.get_branch_name()
             repo.git.branch('-D', branch_name)
             QMessageBox.information(self,"Delete branch",f"Deleted branch '{branch_name}' successfully.")
@@ -412,6 +441,7 @@ class FileDialog(QFileDialog):
             QMessageBox.information(self,"Checkout branch",f"Checked out branch '{branch_name}' successfully.")
         except:
             QMessageBox.warning(self,"Error",f"An error occurred while checking out branch '{branch_name}':")
+
     def git_merge(self):
         try:
             filelocation, filename = self.call_file_repo()
@@ -425,6 +455,7 @@ class FileDialog(QFileDialog):
                 repo.git.merge('--abort')
                 QMessageBox.warning(self, "Error", "Merge aborted due to conflicts.")
                 #print("Merge aborted due to conflicts.")
+
 #히스토리랑 트리출력 메시지박스 해야됨
     def show_git_history(self):
         try:
@@ -436,6 +467,7 @@ class FileDialog(QFileDialog):
                 print(f"Author: {commit.author.name} <{commit.author.email}>",end = ' ')
                 print(f"Date: {commit.authored_datetime}",end = ' ')
                 print(f"Message: {commit.message}\n")
+
             self.show_git_tree(self.get_id(),filelocation)
         except Exception as e:
             print(f"An error occurred while retrieving Git history:")
@@ -463,55 +495,6 @@ class FileDialog(QFileDialog):
     # commit_id = 'commit-id'
     # show_git_tree(repo_path, commit_id)
     def git_clone(self,github_url, username=None, password=None):
-        # Create the application
-        app = QApplication([])
-
-        # Check if the repository is public or private
-        repository_visibility, ok = self.QFileDialog.getItem(
-            None,
-            "Repository Visibility",
-            "Is the GitHub repository public or private?",
-            ["public", "private"]
-        )
-
-        if ok:
-            if repository_visibility == "public":
-                # Prompt for the public repository URL
-                repository_url, _ = QFileDialog.getOpenFileName(
-                    None,
-                    "Public Repository",
-                    "Select the GitHub repository URL"
-                )
-                git.Repo.clone_from(repository_url, './')
-
-            elif repository_visibility == "private":
-                # Prompt for the private repository URL, ID, and access token
-                repository_url, _ = QFileDialog.getOpenFileName(
-                    None,
-                    "Private Repository",
-                    "Select the GitHub repository URL"
-                )
-                github_id, ok = QFileDialog.getText(
-                    None,
-                    "GitHub Credentials",
-                    "Enter your GitHub username or organization name:"
-                )
-                if ok:
-                    github_token, ok = QFileDialog.getText(
-                        None,
-                        "GitHub Credentials",
-                        "Enter your GitHub access token:"
-                    )
-                    if ok:
-                        # Set the GitHub credentials for cloning the private repository
-                        git.config.Git().set_credentials(github_id, github_token)
-                        git.Repo.clone_from(repository_url, './')
-
-            else:
-                QMessageBox.warning(None, "Invalid Input", "Invalid repository visibility.")
-
-
-'''
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo.clone_from(github_url, filelocation, username=username, password=password)
@@ -531,7 +514,6 @@ class FileDialog(QFileDialog):
     #     username = input("Enter your GitHub username: ")
     #     password = input("Enter your GitHub personal access token: ")
     #     git_clone(repo_path, github_url, username=username, password=password)
-'''
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     dialog = FileDialog()
@@ -543,5 +525,5 @@ if __name__ == '__main__':
         dialog.show()
 
     sys.exit(app.exec_())
-
+#tomerge
 
