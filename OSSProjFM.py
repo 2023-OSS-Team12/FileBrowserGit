@@ -336,30 +336,29 @@ class FileDialog(QFileDialog):
             status_label.setText(stat)
         except:
             QMessageBox.warning(self, "Error", "Empty File Directory.\nSelect File First")
+
+    # branch_name = input('input branch name')
     def get_branch_name(self):
         try:
-            branch_name, ok = QInputDialog.getText(self, 'Branch input', 'Enter name for Branch:')  # 사용자에게 입력 받을 대화 상자 생성
-            while ok and not branch_name.strip():  # 파일 이름이 없는 경우를 처리
+            branch_name, ok = QInputDialog.getText(self, 'Branch input', 'Enter name for Branch:')
+            while ok and not branch_name.strip():  # 브랜치 입력이 없는 경우를 처리
                 QMessageBox.warning(self, "Invalid Branch Name", "Branch name cannot be empty. Please enter again.")
                 branch_name, ok = QInputDialog.getText(self, 'Branch Name', 'Enter name for Branch:')
-            if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 새 파일 생성
-                QMessageBox.information(self, "", f"New branch created: {branch_name}")
+            if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 브랜치 이름 반환
                 return branch_name
         except:
             QMessageBox.warning(self, "Error", "Error.\n")
     def get_id(self):
         try:
-            ID, ok = QInputDialog.getText(self, 'ID input',
-                                                   'Enter ID:')  # 사용자에게 입력 받을 대화 상자 생성
-            while ok and not ID.strip():  # 파일 이름이 없는 경우를 처리
+            ID, ok = QInputDialog.getText(self, 'ID input', 'Enter ID:')
+            while ok and not ID.strip():
                 QMessageBox.warning(self, "Invalid ID Name", "ID cannot be empty. Please enter again.")
                 ID, ok = QInputDialog.getText(self, 'ID', 'Enter ID:')
-            if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), 새 파일 생성
+            if ok:  # 'ok'가 True라면 (사용자가 'OK'를 눌렀다면), ID 반환
                 QMessageBox.information(self, "", f"Access: {ID}")
                 return ID
         except:
             QMessageBox.warning(self, "Error", "Error.\n")
-    #branch_name = input('input branch name')
         return ID
     def show_branch(self):
         filelocation, filename = self.call_file_repo()
@@ -375,9 +374,10 @@ class FileDialog(QFileDialog):
             filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
             branch_name = self.get_branch_name()
-            new_branch = repo.create_head(branch_name)
-            repo.head.reference = new_branch
-            QMessageBox.information(self,"Make branch",f"Created branch '{branch_name}' successfully.")
+            if branch_name is not None:
+                new_branch = repo.create_head(branch_name)
+                repo.head.reference = new_branch
+                QMessageBox.information(self,"Make branch",f"Created branch '{branch_name}' successfully.")
         except:
             QMessageBox.warning(self,"Error",f"An error occurred while creating branch '{branch_name}':")
     def delete_branch(self):
