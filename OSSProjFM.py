@@ -471,6 +471,8 @@ class FileDialog(QFileDialog):
             filelocation, filename = self.call_file_repo()
             repository_visibility, ok = QInputDialog.getText(self, 'public or private',
                                           'Is the GitHub repository public or private? (public/private): ')
+            #layout =
+            #repository_visibility =
             print(repository_visibility)
             if repository_visibility.lower() == "public":
                 # Prompt for the public repository URL
@@ -481,25 +483,17 @@ class FileDialog(QFileDialog):
                 #git.Repo.clone_from(repository_url[0],filelocation)
                 print("success")
             elif repository_visibility.lower() == "private":
-                #repository_url = QInputDialog.getText(self, 'private',"Enter the GitHub repository URL: ")
-                #github_id = QInputDialog.getText(self, 'github id',"Enter your GitHub username or organization name: ")
-                #github_token = QInputDialog.getText(self, 'github id',"Enter your GitHub access token: ")
+                url = QInputDialog.getText(self, 'private',"Enter the GitHub repository URL: ")
+                github_id = QInputDialog.getText(self, 'github id',"Enter your GitHub username or organization name: ")
+                github_token = QInputDialog.getText(self, 'github id',"Enter your GitHub access token: ")
                 # Set the GitHub credentials for cloning the private repository
+                url = url[0][8:]
+                private_url = 'https://'+github_token[0]+':x-oauth-basic@'+url
 
-                repository_url = 'https://github.com/Baejjyee/maple_web_exercise.git'
-                github_id = 'Baejjyee'
-                github_token = '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'
-
-                print(github_id, github_token, repository_url)
-                #git.config.Git().set_credentials(github_id[0], github_token[0])
-                git.Git(filelocation).clone(repository_url,github_id,github_token)
-                #Repo.clone_from(repository_url, filelocation, auth=(github_id, github_token))
-                #git.Git(filelocation).clone(repository_url[0])
-
-                #git.Repo.clone_from(repository_url[0])
+                git.Git(filelocation).clone(private_url)
 
             else:
-                print("Invalid repository visibility.")
+                print("오타발견")
         except:
             QMessageBox.warning(self, "Error","Invalid repository visibility.")
 #https://github.com/Baejjyee/maple_web_exercise.git
