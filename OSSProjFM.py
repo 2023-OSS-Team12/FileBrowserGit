@@ -463,6 +463,8 @@ class FileDialog(QFileDialog):
             repo = Repo(filelocation)
             commits = repo.iter_commits()
             history_text = ""
+            history_text += repo.git.log('--oneline', '--graph') #tree 출력
+            #git log 자세하게 나오는 곳
             for commit in commits:
                 history_text += f"Commit: {commit.hexsha}\n"
                 history_text += f"Author: {commit.author.name} <{commit.author.email}>\n"
@@ -471,6 +473,7 @@ class FileDialog(QFileDialog):
 
             # Create a new window to display the Git history
             history_window = QDialog()
+            history_window.setFixedSize(900,500)
             history_window.setWindowTitle("Git History")
             history_layout = QVBoxLayout()
             history_textbox = QTextEdit()
