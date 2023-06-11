@@ -462,15 +462,25 @@ class FileDialog(QFileDialog):
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
             commits = repo.iter_commits()
+            history_text = ""
             for commit in commits:
-                print(f"Commit: {commit.hexsha}",end = ' ')
-                print(f"Author: {commit.author.name} <{commit.author.email}>",end = ' ')
-                print(f"Date: {commit.authored_datetime}",end = ' ')
-                print(f"Message: {commit.message}\n")
+                history_text += f"Commit: {commit.hexsha}\n"
+                history_text += f"Author: {commit.author.name} <{commit.author.email}>\n"
+                history_text += f"Date: {commit.authored_datetime}\n"
+                history_text += f"Message: {commit.message}\n\n"
 
-            self.show_git_tree(self.get_id(),filelocation)
+            # Create a new window to display the Git history
+            history_window = QDialog()
+            history_window.setWindowTitle("Git History")
+            history_layout = QVBoxLayout()
+            history_textbox = QTextEdit()
+            history_textbox.setText(history_text)
+            history_textbox.setReadOnly(True)
+            history_layout.addWidget(history_textbox)
+            history_window.setLayout(history_layout)
+            history_window.exec_()
         except Exception as e:
-            print(f"An error occurred while retrieving Git history:")
+            print("An error occurred while retrieving Git history:")
             print(e)
 
     def show_git_tree(self,commit_id,filelocation):
