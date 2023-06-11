@@ -376,7 +376,6 @@ class FileDialog(QFileDialog):
         listwidget.addItems(res)
 
 
-
     def get_branch_name(self):
         try:
             branch_name, ok = QInputDialog.getText(self, 'Branch input', 'Enter name for Branch:')
@@ -417,17 +416,18 @@ class FileDialog(QFileDialog):
         try:
             filelocation,filename = self.call_file_repo()
             repo = Repo(filelocation)
-            branch_name = self.get_branch_name()
+            branch_name = self.list_widget.currentItem().text()
             repo.git.branch('-D', branch_name)
             QMessageBox.information(self,"Delete branch",f"Deleted branch '{branch_name}' successfully.")
             self.current_branches(repo, self.list_widget)  # update QListWidget
-        except:
+        except Exception as e:
+            print(e)
             QMessageBox.warning(self,"Error",f"An error occurred while deleting branch '{branch_name}':")
     def rename_branch(self):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
-            old_branch_name = self.get_branch_name()
+            old_branch_name = self.list_widget.currentItem().text()
             new_branch_name = self.get_branch_name()
             repo.git.branch('-m', old_branch_name, new_branch_name)
             QMessageBox.information(self,"Rename branch",f"Renamed branch '{old_branch_name}' to '{new_branch_name}' successfully.")
@@ -438,7 +438,7 @@ class FileDialog(QFileDialog):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
-            branch_name = self.get_branch_name()
+            branch_name = self.list_widget.currentItem().text()
             repo.git.checkout(branch_name)
             print(f"Checked out branch '{branch_name}' successfully.")
             QMessageBox.information(self,"Checkout branch",f"Checked out branch '{branch_name}' successfully.")
@@ -449,7 +449,7 @@ class FileDialog(QFileDialog):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
-            branch_name = self.get_branch_name()
+            branch_name = self.list_widget.currentItem().text()
             repo.git.merge(branch_name)
             QMessageBox.information(self,"Merge branch",f"Merged branch '{branch_name}' successfully.")
             self.current_branches(repo, self.list_widget)  # update QListWidget
