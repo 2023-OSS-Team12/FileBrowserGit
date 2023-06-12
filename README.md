@@ -1,6 +1,6 @@
 # FileBrowserGit
 
-FileBrowserGit is a Python application that combines the power of PyQt5's QFileDialog with some of Git's most used features, such as initialize a repository, add files to staging, commit changes, restore files, remove files, and rename files. 
+FileBrowserGit is a Python application that combines the power of PyQt5's QFileDialog with some of Git's most used features, such as initialize a repository, add files to staging, commit changes, restore files, remove files, and rename files. Also displays a list of branches for the repository currently being managed by Git, as well as buttons for additional branch operations.
 
 The original project is here: [FileManager](https://github.com/Tristan296/FileManager)
 
@@ -74,6 +74,30 @@ The original project is here: [FileManager](https://github.com/Tristan296/FileMa
 >   >   **D : removed**
 >   >   
 >   >   **R : moved**
+
+### 3. Control Branch :  This section provides buttons for several Git operations such as:
+
+>   **Show Branch list:** Shows a list of branches. If the selected file is managed by Git, it will show the name of the branch.
+>   
+>   **Make Branch** : A button for the `git branch <branch name>` command. It asks the user for a branch name and creates a new branch. At this time, the branch is created at the location of the branch currently being worked on.
+>
+>   **Delete branch** : A button for the `git branch -d <branch name>` command. It deletes the selected branch from the branch list.
+>
+>   **Rename branch** : A button for the `git branch -m old-branch new-branch` command. It modifies the name of the selected branch in the Git branch list.
+>
+>   **Checkout branch** : A button for the `git checkout` command. It performs a checkout to the branch selected from the branch list.
+>
+>   **Merge branch** : A button for the `git merge` command. It supports merging two branches. Select the branch you want to merge and try to merge. If a conflict occurs during this process, it provides unmerge paths and a simple abort option.
+>
+>   **Git History** : A button for the `git log` command. Each commit content sequentially outputs the name of the commit author, the commit time, and the commit message.
+>
+>   **Git Clone** : A button for the `git clone` command. You can choose the public or private option.
+>
+>   >   If public, it asks the user for the GitHub address.
+>   >    
+>   >   If private, it asks the user for the GitHub address, ID, and token.
+>   >   
+> If an error occurs in each button, it will output an error message.
 
 ## Usage
 
