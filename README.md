@@ -19,7 +19,9 @@ The original project is here: [FileManager](https://github.com/Tristan296/FileMa
 
 📎**Download Link**
 
-```v1.0``` https://github.com/2023-OSS-Team12/FileBrowserGit/releases/tag/v1.x
+[```v2.0```](https://github.com/2023-OSS-Team12/FileBrowserGit/releases/tag/v2.0) << Latest Version!
+
+~~[```v1.0```](https://github.com/2023-OSS-Team12/FileBrowserGit/releases/tag/v1.0)~~
 
 ✔️ **If you want to run this program in other OS (Linux, MacOS, ...), you must install these packages. Then run OSSProjFM.py.**
 
@@ -50,7 +52,7 @@ The original project is here: [FileManager](https://github.com/Tristan296/FileMa
 
 >   **Git Init** : Button for `git init` command. This button initializes a Git repository in the current directory of the selected file.
 >   
->   **Git Clone** : A button for the `git clone` command. You can choose the public or private option.
+>   **Git Clone** : A button for the `git clone` command. You can choose the public or private option. (The URL must end in '.git'.)
 >
 >   >   If public, it asks the user for the GitHub address.
 >   >    
@@ -124,9 +126,21 @@ This tool can be especially useful for those who are new to Git and want a more 
 
 ![Animation3](https://github.com/2023-OSS-Team12/FileBrowserGit/assets/58902513/2fe68a62-94b9-4e6b-a0f4-8b89e57fd323)
 
+### ex3) Cloning a repository. (This process may take some time)
 
+![Animation11](https://github.com/2023-OSS-Team12/FileBrowserGit/assets/58902513/51cdcfc4-71b7-4ccf-aa7e-96b6295e07af)
 
+### ex4-1) Make branche 'new_branch'.
 
+![Animation12](https://github.com/2023-OSS-Team12/FileBrowserGit/assets/58902513/711ce674-1325-451f-bc30-22706d74768b)
+
+### ex4-2) Checkout to 'new_branch' and merge 'branch1'.
+
+![Animation13](https://github.com/2023-OSS-Team12/FileBrowserGit/assets/58902513/63043a0e-deba-441e-88f5-c218df42c838)
+
+### ex5) List out commit history and show detail of selected commit.
+
+![Animation14](https://github.com/2023-OSS-Team12/FileBrowserGit/assets/58902513/487bb3f7-b956-4980-a8ce-5677ea34f100)
 
 ## License
 
