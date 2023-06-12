@@ -464,41 +464,66 @@ class FileDialog(QFileDialog):
         try:
             filelocation, filename = self.call_file_repo()
             repo = Repo(filelocation)
-            commits = repo.iter_commits()
+            commit_tree = []
             history_text = ""
             history_text += repo.git.log('--oneline', '--graph') #tree 출력
-            #git log 자세하게 나오는 곳
-            for commit in commits:
-                history_text += f"Commit: {commit.hexsha}\n"
-                history_text += f"Author: {commit.author.name} <{commit.author.email}>\n"
-                history_text += f"Date: {commit.authored_datetime}\n"
-                history_text += f"Message: {commit.message}\n\n"
-
+            commit_tree = history_text.split("\n")
             # Create a new window to display the Git history
             history_window = QDialog()
             history_window.setFixedSize(900,500)
             history_window.setWindowTitle("Git History")
             history_layout = QVBoxLayout()
-            history_textbox = QTextEdit()
-            history_textbox.setText(history_text)
-            history_textbox.setReadOnly(True)
-            history_layout.addWidget(history_textbox)
+            self.history_listbox = QListWidget()
+            self.history_listbox.addItems(commit_tree)
+            history_layout.addWidget(self.history_listbox)
             history_window.setLayout(history_layout)
+
+            button_layout = QVBoxLayout()
+            show_commit = QPushButton("Show detail commit")
+            show_commit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            show_commit.clicked.connect(self.show_detail_commit)
+            button_layout.addWidget(show_commit)
+            history_layout.addLayout(button_layout)
             history_window.exec_()
+
         except Exception as e:
             print("An error occurred while retrieving Git history:")
             print(e)
 
-    def show_git_tree(self,commit_id,filelocation):
-        try:
-            #filelocation, filename = self.call_file_repo()
-            repo = Repo(filelocation)
-            commit = repo.commit(commit_id)
-            tree = commit.tree
 
-            for item in tree.traverse():
-                indent = "    " * item.depth
-                print(f"{indent}{item.path}")
+    def show_detail_commit(self):
+        try:
+            filelocation, filename = self.call_file_repo()
+            repo = Repo(filelocation)
+            commits = repo.iter_commits()
+            commit_checksum = []
+            commit_checksum = self.history_listbox.currentItem().text().split()
+            i = 0
+            for c in commit_checksum:
+                if commit_checksum[i] != '*' and commit_checksum[i] != '/' and commit_checksum[i] != '|' and commit_checksum[i] != '\\':
+                    break
+                i += 1
+            print(commit_checksum)
+            print(i)
+            commit_text = ""
+            for c in commits:
+                if c.hexsha[0:7] == commit_checksum[i]:
+                    commit_text = ""
+                    commit_text += f"Commit: {c.hexsha}\n"
+                    commit_text += f"Author: {c.author.name} <{c.author.email}>\n"
+                    commit_text += f"Date: {c.authored_datetime}\n"
+                    commit_text += f"Message: {c.message}\n\n"
+
+
+            detail_window = QDialog()
+            detail_window.setFixedSize(400, 150)
+            detail_layout = QVBoxLayout()
+            detail_text = QTextEdit()
+            detail_text.setText(commit_text)
+            detail_text.setReadOnly(True)
+            detail_layout.addWidget(detail_text)
+            detail_window.setLayout(detail_layout)
+            detail_window.exec_()
 
         except Exception as e:
             print(f"An error occurred while retrieving Git tree:")
