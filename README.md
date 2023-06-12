@@ -5,11 +5,17 @@ FileBrowserGit is a Python application that combines the power of PyQt5's QFileD
 The original project is here: [FileManager](https://github.com/Tristan296/FileManager)
 
 *****
-
+## Updated in v2.0
+- Git clone repository
+- Show the git history
+- Make a branch
+- Delete the branch
+- Rename the branch
+- Checkout the other branch
 ## Download
 ⚠ **Requirements**
 - OS : Windows
-- Storage : at least 40MB
+- Storage : at least 50MB
 
 📎**Download Link**
 
@@ -38,13 +44,18 @@ The original project is here: [FileManager](https://github.com/Tristan296/FileMa
 > The selected files or folders can then be processed with Git operations. 
 > 
 > The file browsing starts from the most recently visited directory
-> 
+#### ✅(Important!) All files must be selected before use Git Features
 
-### 2. Git Features : This section provides buttons for several Git operations such as:
-#### ✅(Important!) All files must be selected before use these buttons!
+### 2. Basic Git Features : This section provides buttons for several Git operations such as:
 
 >   **Git Init** : Button for `git init` command. This button initializes a Git repository in the current directory of the selected file.
 >   
+>   **Git Clone** : A button for the `git clone` command. You can choose the public or private option.
+>
+>   >   If public, it asks the user for the GitHub address.
+>   >    
+>   >   If private, it asks the user for the GitHub address, ID, and token.
+>   >   
 >   **Git Add** : Button for `git add` command. This button stages the selected file.
 >   
 >   **Git Commit** : Button for `git commit` command and shows staged files. 
@@ -75,8 +86,7 @@ The original project is here: [FileManager](https://github.com/Tristan296/FileMa
 >   >   
 >   >   **R : moved**
 
-### 3. Control Branch :  This section provides buttons for several Git operations such as:
-
+### 3. Git Features : Control Branch
 >   **Show Branch list:** Shows a list of branches. If the selected file is managed by Git, it will show the name of the branch.
 >   
 >   **Make Branch** : A button for the `git branch <branch name>` command. It asks the user for a branch name and creates a new branch. At this time, the branch is created at the location of the branch currently being worked on.
@@ -89,15 +99,8 @@ The original project is here: [FileManager](https://github.com/Tristan296/FileMa
 >
 >   **Merge branch** : A button for the `git merge` command. It supports merging two branches. Select the branch you want to merge and try to merge. If a conflict occurs during this process, it provides unmerge paths and a simple abort option.
 >
->   **Git History** : A button for the `git log` command. Each commit content sequentially outputs the name of the commit author, the commit time, and the commit message.
+>   **Git History** : A button for the `git log` command. It shows git log with graph. If you want more information, select the one of the git log and click the Show detail commit button. Then it sequentially shows commit's 'checksum', 'author's name and email', 'commit time', 'commit message'
 >
->   **Git Clone** : A button for the `git clone` command. You can choose the public or private option.
->
->   >   If public, it asks the user for the GitHub address.
->   >    
->   >   If private, it asks the user for the GitHub address, ID, and token.
->   >   
-> If an error occurs in each button, it will output an error message.
 
 ## Usage
 
