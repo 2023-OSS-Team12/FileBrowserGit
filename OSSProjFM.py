@@ -478,11 +478,18 @@ class FileDialog(QFileDialog):
             history_layout.addWidget(self.history_listbox)
             history_window.setLayout(history_layout)
 
-            button_layout = QVBoxLayout()
+            button_layout = QHBoxLayout()
             show_commit = QPushButton("Show detail commit")
-            show_commit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
             show_commit.clicked.connect(self.show_detail_commit)
+            show_commit.setFixedSize(300,40)
+            show_commit.setStyleSheet("	color: rgb(58, 134, 255);"
+                                        "background-color: white;"
+	                                    "border: 2px solid rgb(58, 134, 255);"
+	                                    "border-radius: 5px;")
+
             button_layout.addWidget(show_commit)
+
             history_layout.addLayout(button_layout)
             history_window.exec_()
 
